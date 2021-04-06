@@ -24,14 +24,27 @@ namespace DMNet.SpacemanDMM.AST.Converters
             var obj = (CborObject)element;
             foreach (var prop in obj)
             {
-                var cborArray = (CborArray)prop.Value;
+                var cborArray = prop.Value as CborArray;
                 switch (prop.Key.Value<string>())
                 {
+                    case "Index":
+                        return new Follow.Index()
+                        {
+                            Expression = PolymorphicExpressionConverter.ParseExpression(prop.Value)
+                        };
                     case "Field":
                         return new Follow.Field()
                         {
                             Index = Enum.Parse<Follow.IndexKind>(cborArray[0].Value<string>()),
                             Identifier = cborArray[1].Value<string>()
+                        };
+                    case "Call":
+                        var callArgsArray = (CborArray)cborArray[2];
+                        return new Follow.Call()
+                        {
+                            Index = Enum.Parse<Follow.IndexKind>(cborArray[0].Value<string>()),
+                            Identifier = cborArray[1].Value<string>(),
+                            Arguments = callArgsArray.ToCollection<Expression[]>()
                         };
                     default:
                         Console.WriteLine($"{prop.Key}: {prop.Value}");

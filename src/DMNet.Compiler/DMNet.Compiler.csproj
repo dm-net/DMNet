@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DMNet.Runtime\DMNet.Runtime.csproj" />
+    <ProjectReference Include="..\DMNet.SpacemanDMM\DMNet.SpacemanDMM.csproj" />
+  </ItemGroup>
+
+</Project>

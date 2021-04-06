@@ -62,6 +62,10 @@ namespace DMNet.SpacemanDMM.AST.Converters
                         {
                             Value = prop.Value.Value<string>()
                         };
+                    
+                    // As
+
+
                     case "Expr":
                         return new Term.Expr()
                         {
@@ -120,6 +124,42 @@ namespace DMNet.SpacemanDMM.AST.Converters
                         return new Term.List()
                         {
                             Items = listArgs.ToCollection<Expression[]>()
+                        };
+                    case "Input":
+                        var inputObj = (CborObject)prop.Value;
+                        return new Term.Input()
+                        {
+                            Args = ((CborArray)inputObj["args"]).ToCollection<Expression[]>(),
+                            InputType = FlagConverter<InputType>.ParseFlag(inputObj["input_type"]),
+                            In = PolymorphicExpressionConverter.ParseExpression(inputObj["in_list"])
+                        };
+                    case "Locate":
+                        var locateObj = (CborObject)prop.Value;
+                        return new Term.Locate()
+                        {
+                            Args = ((CborArray)locateObj["args"]).ToCollection<Expression[]>(),
+                            In = PolymorphicExpressionConverter.ParseExpression(locateObj["in_list"])
+                        };
+                    case "Pick":
+                        var pickValues = (CborArray)prop.Value;
+                        var pickValueList = new List<Tuple<Expression, Expression>>();
+                        foreach (var item in pickValues)
+                        {
+                            var tuple = (CborArray)item;
+                            var item1 = PolymorphicExpressionConverter.ParseExpression(tuple[0]);
+                            var item2 = PolymorphicExpressionConverter.ParseExpression(tuple[1]);
+                            pickValueList.Add(new Tuple<Expression, Expression>(item1, item2));
+                        }
+                        return new Term.Pick()
+                        {
+                            Values = pickValueList.ToArray()
+                        };
+                    case "DynamicCall":
+                        var dynamicCallTuple = (CborArray)prop.Value;
+                        return new Term.DynamicCall()
+                        {
+                            Indentifiers = ((CborArray)dynamicCallTuple[0]).ToCollection<Expression[]>(),
+                            Arguments = ((CborArray)dynamicCallTuple[1]).ToCollection<Expression[]>()
                         };
                     default:
                         Console.WriteLine($"{prop.Key}: {prop.Value}");

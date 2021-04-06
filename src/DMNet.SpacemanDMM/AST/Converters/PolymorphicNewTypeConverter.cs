@@ -40,7 +40,13 @@ namespace DMNet.SpacemanDMM.AST.Converters
                             {
                                 Value = PrefabConverter.ParsePrefab(prop.Value)
                             };
-                        // Todo: MiniExpr
+                        case "MiniExpr":
+                            var valObj = (CborObject)prop.Value;
+                            return new NewType.MiniExpr()
+                            {
+                                Identifier = valObj["ident"].Value<string>(),
+                                Fields = ((CborArray)valObj["fields"]).ToCollection<Follow[]>()
+                            };
                         default:
                             Console.WriteLine($"{prop.Key}: {prop.Value}");
                             throw new Exception();

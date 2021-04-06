@@ -7,7 +7,7 @@ namespace DMNet.SpacemanDMM.AST
     public class VarType
     {
         [CborProperty("flags")]
-        [CborConverter(typeof(VarTypeFlagConverter))]
+        [CborConverter(typeof(FlagConverter<VarTypeFlags>))]
         public VarTypeFlags Flags { get; set; }
 
         [CborProperty("type_path")]

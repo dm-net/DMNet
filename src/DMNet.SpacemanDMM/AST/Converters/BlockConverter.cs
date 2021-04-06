@@ -22,6 +22,8 @@ namespace DMNet.SpacemanDMM.AST.Converters
 
         public static Block ParseBlock(CborValue element)
         {
+            if (element == null || element.Type == CborValueType.Null)
+                return null;
             var cborArray = (CborArray)element;
             return new Block()
             {

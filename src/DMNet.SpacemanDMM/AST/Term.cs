@@ -84,11 +84,29 @@ namespace DMNet.SpacemanDMM.AST
             public Expression[] Items { get; set; }
         }
 
-        // Skiped
+        public class Input : Term
+        {
+            public Expression[] Args { get; set; }
+            public InputType InputType { get; set; }
+            public Expression In { get; set; }
+        }
+
+        public class Locate : Term
+        {
+            public Expression[] Args { get; set; }
+            public Expression In { get; set; }
+        }
+
+        public class Pick : Term
+        {
+            public Tuple<Expression, Expression>[] Values { get; set; }
+        }
+
+        public class DynamicCall : Term
+        {
+            public Expression[] Indentifiers { get; set; }
+            public Expression[] Arguments { get; set; }
+        }
+
     }
-
-
-
-
-
 }

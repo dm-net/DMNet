@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace DMNet.SpacemanDMM
+namespace DMNet.SpacemanDMM.Wrapper
 {
-    public static class Native
+    internal static class Native
     {
         public const string Dreammaker_ffiLib = "dreammaker";
 
@@ -35,6 +35,12 @@ namespace DMNet.SpacemanDMM
         internal static extern IntPtr dreammaker_type_getpath(Type typeref);
 
         [DllImport(Dreammaker_ffiLib)]
+        internal static extern uint dreammaker_type_getindex(Type typeref);
+
+        [DllImport(Dreammaker_ffiLib)]
+        internal static extern uint dreammaker_type_getparentindex(Type typeref);
+
+        [DllImport(Dreammaker_ffiLib)]
         internal static extern void dreammaker_type_iterchildren(Type typeref, TypeIterator iterator);
 
         [DllImport(Dreammaker_ffiLib)]
@@ -45,9 +51,6 @@ namespace DMNet.SpacemanDMM
 
         [DllImport(Dreammaker_ffiLib)]
         internal static extern void dreammaker_cbor_free(CborData cborData);
-
-        [DllImport(Dreammaker_ffiLib)]
-        internal static extern void dreammaker_var_free(Var typeref);
 
         [DllImport(Dreammaker_ffiLib)]
         internal static extern void str_free(IntPtr str);

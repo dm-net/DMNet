@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DMNet.SpacemanDMM
+namespace DMNet.SpacemanDMM.Wrapper
 {
     internal class Utf8String : IDisposable
     {

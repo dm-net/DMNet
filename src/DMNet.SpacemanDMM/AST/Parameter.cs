@@ -1,4 +1,5 @@
 ﻿using Dahomey.Cbor.Attributes;
+using DMNet.SpacemanDMM.AST.Converters;
 
 namespace DMNet.SpacemanDMM.AST
 {
@@ -13,10 +14,10 @@ namespace DMNet.SpacemanDMM.AST
         [CborProperty("default")]
         public Expression Default { get; set; }
 
-        /* TODO: ImputType
         [CborProperty("input_type")]
-        public Expression Default { get; set; }
-        */
+        [CborConverter(typeof(FlagConverter<InputType>))]
+        public InputType InputType { get; set; }
+        
 
         [CborProperty("in_list")]
         public Expression InList { get; set; }

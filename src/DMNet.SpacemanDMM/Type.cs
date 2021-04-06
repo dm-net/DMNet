@@ -1,87 +1,59 @@
-﻿using Dahomey.Cbor;
-using DMNet.SpacemanDMM.AST;
+﻿using DMNet.SpacemanDMM.AST;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DMNet.SpacemanDMM
 {
-    public struct Type
+    public class Type
     {
-        /// <summary>
-        /// The reference.
-        /// </summary>
-        private readonly IntPtr reference;
+        private Wrapper.Type type;
 
-        public bool IsValid => reference != IntPtr.Zero;
-        private void Verify()
+        private TypeProc[] _procs = null;
+        private TypeVar[] _vars = null;
+        private string _typePath = null;
+        private Parser _parser;
+        private uint _index;
+        private uint _parentIndex;
+
+        public TypeProc[] Procs => _procs;
+        public TypeVar[] Vars => _vars;
+
+        public string Path => _typePath;
+
+        public bool IsRoot => string.IsNullOrEmpty(Path);
+
+        public Type ParentType => _parser.GetTypeByIndex(_parentIndex);
+
+        internal Type(Wrapper.Type nativeType, Parser parser)
         {
-            if (!IsValid)
-                throw new NullReferenceException();
+            _parser = parser;
+            type = nativeType;
+            load();
+            type.Free();
+            type = Wrapper.Type.Invalid;
         }
 
-
-        public string Path
+        private void load()
         {
-            get
-            {
-                Verify();
-                var ptr = Native.dreammaker_type_getpath(this);
-                var str = Utf8String.FromIntPtr(ptr);
-                Native.str_free(ptr);
-                return str;
-            }
+            if (_procs != null)
+                throw new Exception();
+            _procs = type.GetProcs();
+            if (_vars != null)
+                throw new Exception();
+            _vars = type.GetVars();
+            _typePath = type.Path;
+            _index = type.Index;
+            _parentIndex = type.ParentIndex;
+            _parser.RegisterIndexedType(this, _index);
         }
 
-        public bool IsRoot
+        public TypeVar GetVar(string name)
         {
-            get
-            {
-                Verify();
-                return Native.dreammaker_type_isroot(this);
-            }
-        }
-
-        public List<Type> GetChildren()
-        {
-            var list = new List<Type>();
-            Verify();
-            Native.dreammaker_type_iterchildren(this, type => list.Add(type));
-            return list;
-        }
-
-        public byte[] GetVarsCbor()
-        {
-            Verify();
-            var cbor = Native.dreammaker_type_varscbor(this);
-            var data = cbor.GetBytes();
-            cbor.Free();
-            return data;
-        }
-        
-        public TypeVar[] GetVars()
-        {
-            return Cbor.Deserialize<TypeVar[]>(GetVarsCbor());
-        }
-
-        public byte[] GetProcsCbor()
-        {
-            Verify();
-            var cbor = Native.dreammaker_type_procscbor(this);
-            var data = cbor.GetBytes();
-            cbor.Free();
-            return data;
-        }
-
-        public TypeProc[] GetProcs()
-        {
-            return Cbor.Deserialize<TypeProc[]>(GetProcsCbor());
-        }
-
-        public void Free()
-        {
-            Verify();
-            Native.dreammaker_type_free(this);
+            foreach (var item in _vars)
+                if (item.Name.Equals(name))
+                    return item;
+            return null;
         }
     }
 }

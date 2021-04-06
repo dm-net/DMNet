@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DMNet.SpacemanDMM
+namespace DMNet.SpacemanDMM.Wrapper
 {
     internal struct Context
     {

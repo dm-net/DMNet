@@ -5,6 +5,9 @@ using System.Linq;
 using Dahomey.Cbor;
 using Dahomey.Cbor.ObjectModel;
 using DMNet.SpacemanDMM;
+using DMNet.Compiler;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DMNet
 {
@@ -12,45 +15,26 @@ namespace DMNet
     {
         static void Main(string[] args)
         {
-            var parser = new ManagedParser(@"C:\Projektai\DMBase\DMBase.dme");
-            //var parser = new ManagedParser(@"C:\Projektai\Aurora.3\aurorastation.dme");
-            Console.WriteLine(parser);
-
-            var rootType = parser.RootType;
-            //Console.WriteLine(rootType);
-            //Console.WriteLine(rootType.Path);
-            //Console.WriteLine(rootType.IsRoot);
-            //var cborObject = Cbor.Deserialize<CborArray>(rootType.GetVarsCbor());
-            //Console.WriteLine(BitConverter.ToString(rootType.GetVarsCbor()).Replace('-', ' '));
-            //var rootVars = rootType.GetVars();
+           var parser = new Parser(@"C:\Projektai\DMBase\DMBase.dme");
+           // var parser = new Parser(@"C:\Projektai\Aurora.3\aurorastation.dme");
+           Console.WriteLine(parser);
 
 
+            var c = new Compiler.Compiler(parser);
+            c.BuildSymbolData();
+            Console.WriteLine(c);
 
+            var Assm = c.Emit("DMBase");
+            var generator = new Lokad.ILPack.AssemblyGenerator();
 
-            var types = parser.GetTypes();
+            var refrencedAssemblies = new List<Assembly>();
 
-            //var myDatum = types.First(t => t.Path.Contains("myDatum"));
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-            foreach (var type in types)
-            {
-                Console.WriteLine($"{type.Path}");
-                var vars = type.GetVars();
-                var procs = type.GetProcs();
-                Console.WriteLine($"{procs}");
-            }
+            refrencedAssemblies.Add(loadedAssemblies.Where(a => a.GetName().Name == "System.Runtime").First());
 
-            //var things = rootType.GetVars();
-            //Console.WriteLine(rootType.GetVarsJson());
+            generator.GenerateAssembly(Assm, "DMBase.dll");
 
-            //var types = objTree.GetTypes();
-            //foreach (var child in types)
-            //{
-            //    Console.WriteLine(child);
-            //    Console.WriteLine(child.Path);
-            //}
-
-
-            Console.ReadKey();
         }
     }
 }
