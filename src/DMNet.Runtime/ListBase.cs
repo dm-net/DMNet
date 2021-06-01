@@ -5,10 +5,10 @@ using System.Text;
 
 namespace DMNet.Runtime
 {
-    [Bultin("/@datum")]
-    public abstract class DatumBase
+    [Bultin("/@list")]
+    public class ListBase
     {
-        public DatumBase()
+        public ListBase()
         {
 
         }

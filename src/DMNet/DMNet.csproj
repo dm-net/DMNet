@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Lokad.ILPack" Version="0.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DMNet.CodeAnalysis\DMNet.CodeAnalysis.csproj" />
     <ProjectReference Include="..\DMNet.Compiler\DMNet.Compiler.csproj" />
     <ProjectReference Include="..\DMNet.SpacemanDMM\DMNet.SpacemanDMM.csproj" />
@@ -15,12 +19,6 @@
     <Reference Include="Lokad.ILPack">
       <HintPath>Lokad.ILPack.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Lokad.ILPack.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

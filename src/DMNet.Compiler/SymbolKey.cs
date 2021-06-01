@@ -19,10 +19,18 @@ namespace DMNet.Compiler
         {
             return Type.Equals(other.Type) && Name.Equals(other.Name);
         }
+
+        public static SymbolKey Ctor => new SymbolKey(SymbolType.Ctor, ".ctor");
+
+        public override string ToString()
+        {
+            return $"({Type}-{Name})";
+        }
     }
 
     public enum SymbolType
     {
+        Ctor,
         Type,
         Proc,
         Var,

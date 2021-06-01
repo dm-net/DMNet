@@ -1,5 +1,7 @@
 ﻿using DMNet.SpacemanDMM.AST;
+using System;
 using System.Linq;
+using System.Reflection;
 using DMType = DMNet.SpacemanDMM.Type;
 
 namespace DMNet.Compiler
@@ -13,6 +15,98 @@ namespace DMNet.Compiler
             {
                 _symBuildWalk(type);
             }
+
+            LoadBultinSymbols();
+        }
+
+        /// <summary>
+        /// Loads special bultin symbols
+        /// </summary>
+        private void LoadBultinSymbols()
+        {
+            var assembly = typeof(Runtime.GlobalBase).Assembly;
+
+            var types = assembly.GetExportedTypes();
+
+            foreach (var type in types)
+            {
+                var bultinAttributes = type.GetCustomAttributes(typeof(Runtime.Attributes.BultinAttribute), false);
+                if (bultinAttributes.Length < 1)
+                    continue;
+
+                var bultinAttribute = (Runtime.Attributes.BultinAttribute)bultinAttributes[0];
+
+                string name = type.Name;
+                if (bultinAttribute.Name != null)
+                    name = bultinAttribute.Name;
+
+                _rigisterBultinTypeSymbol(type, name);
+            }
+        }
+
+        private void _rigisterBultinTypeSymbol(Type type, string name)
+        {
+            var symbol = new Symbol.TypeSymbol();
+            symbol.Definition = type;
+            symbol.Stage = Symbol.DefinitionStage.FULLY_DEFINED;
+            symbol.IsFullyDefined = true;
+            globalSymbols.Add(new SymbolKey(SymbolType.Type, name), symbol);
+
+            foreach (var field in type.GetFields())
+            {
+                var bultinAttributes = field.GetCustomAttributes(typeof(Runtime.Attributes.BultinAttribute), false);
+                if (bultinAttributes.Length < 1)
+                    continue;
+
+                var bultinAttribute = (Runtime.Attributes.BultinAttribute)bultinAttributes[0];
+
+                var varName = field.Name;
+                if (bultinAttribute.Name != null)
+                    varName = bultinAttribute.Name;
+
+                _rigisterBultinVarSymbol(field, varName, symbol.Symbols);
+            }
+
+            foreach (var method in type.GetMethods())
+            {
+                var bultinAttributes = method.GetCustomAttributes(typeof(Runtime.Attributes.BultinAttribute), false);
+                if (bultinAttributes.Length < 1)
+                    continue;
+
+                var bultinAttribute = (Runtime.Attributes.BultinAttribute)bultinAttributes[0];
+
+                var procName = method.Name;
+                if (bultinAttribute.Name != null)
+                    procName = bultinAttribute.Name;
+
+                _rigisterBultinProcSymbol(method, procName, symbol.Symbols);
+            }
+
+            var ctor = type.GetConstructor(Type.EmptyTypes);
+
+            var ctorSymbol = new Symbol.CtorSymbol();
+            ctorSymbol.Stage = Symbol.DefinitionStage.FULLY_DEFINED;
+            ctorSymbol.Definition = ctor;
+
+            symbol.Symbols.Add(SymbolKey.Ctor, ctorSymbol);
+        }
+
+        private void _rigisterBultinVarSymbol(FieldInfo field, string name, SymbolTable targetSymbolTable)
+        {
+            var symbol = new Symbol.VarSymbol();
+            symbol.Stage = Symbol.DefinitionStage.FULLY_DEFINED;
+            symbol.Definition = field;
+
+            targetSymbolTable.Add(new SymbolKey(SymbolType.Var, name), symbol);
+        }
+
+        private void _rigisterBultinProcSymbol(MethodInfo method, string name, SymbolTable targetSymbolTable)
+        {
+            var symbol = new Symbol.ProcSymbol();
+            symbol.Stage = Symbol.DefinitionStage.FULLY_DEFINED;
+            symbol.Definition = method;
+
+            targetSymbolTable.Add(new SymbolKey(SymbolType.Proc, name), symbol);
         }
 
         private void _symBuildWalk(DMType type)

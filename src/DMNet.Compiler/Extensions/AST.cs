@@ -91,9 +91,27 @@ namespace DMNet.Compiler.Extensions
 
         public static Symbol.TypeSymbol ParentTypeSymbol(this DMType value, SymbolTable globalSymbols)
         {
+            if (value == null)
+                return null;
+            switch (value.Path)
+            {
+                case "/datum":
+                    return (Symbol.TypeSymbol)globalSymbols[new SymbolKey(SymbolType.Type, "/@datum")];
+                case "/list":
+                    return (Symbol.TypeSymbol)globalSymbols[new SymbolKey(SymbolType.Type, "/@list")];
+                case "/world":
+                    return (Symbol.TypeSymbol)globalSymbols[new SymbolKey(SymbolType.Type, "/@world")];
+                case "/client":
+                    return (Symbol.TypeSymbol)globalSymbols[new SymbolKey(SymbolType.Type, "/@client")];
+                case "/savefile":
+                    return (Symbol.TypeSymbol)globalSymbols[new SymbolKey(SymbolType.Type, "/@savefile")];
+            }
             var parentType = value.ParentType;
+
+
             if (string.IsNullOrEmpty(parentType?.Path))
                 return null; // ToDo: This should not be reached
+
 
             return (Symbol.TypeSymbol)globalSymbols[new SymbolKey(SymbolType.Type, parentType.Path)];
         }
